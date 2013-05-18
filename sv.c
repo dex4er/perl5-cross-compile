@@ -11755,7 +11755,7 @@ Perl_dirp_dup(pTHX_ DIR *const dp, CLONE_PARAMS *const param)
 {
     DIR *ret;
 
-#ifdef HAS_FCHDIR
+#if defined(HAS_FCHDIR) && defined(HAS_TELLDIR) && defined(HAS_SEEKDIR)
     int rc = 0;
     DIR *pwd;
     const Direntry_t *dirent;
@@ -11776,7 +11776,7 @@ Perl_dirp_dup(pTHX_ DIR *const dp, CLONE_PARAMS *const param)
     if (ret)
 	return ret;
 
-#ifdef HAS_FCHDIR
+#if defined(HAS_FCHDIR) && defined(HAS_TELLDIR) && defined(HAS_SEEKDIR)
 
     PERL_UNUSED_ARG(param);
 
