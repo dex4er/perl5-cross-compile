@@ -242,11 +242,11 @@ if [ "$osname" = "qnx" ]; then
 else
   # $^O eq nto
 
-  ccflags='-U__STRICT_ANSI__'
+  ccflags="$ccflags -U__STRICT_ANSI__"
 
   # Options required to get dynamic linking to work
-  lddlflags='-shared'
-  ccdlflags='-Wl,-E'
+  lddlflags="$lddlflags -shared"
+  ccdlflags="$ccdlflags -Wl,-E"
 
   if $test "X$usecrosscompile" = X; then
     # Somewhere in the build, something tries to throw a gcc
