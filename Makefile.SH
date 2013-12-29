@@ -721,11 +721,12 @@ ext.libs: $(static_ext)
 case "$osname" in
 MSWin32)
 $spitshell >>$Makefile <<'!NO!SUBS!'
-$(GLOBEXE) : perlglob$(o)
-	$(LD) -mconsole -o $@ $(LDDLFLAGS) perlglob$(o)
+$(GLOBEXE) : perlglob$(OBJ_EXT)
+	$(LD) -mconsole -o $@ $(LDDLFLAGS) perlglob$(OBJ_EXT)
 	$(CPS) $(GLOBEXE) t/$(GLOBEXE)
 
-perlglob$(o)  : perlglob.c
+perlglob$(OBJ_EXT)  : perlglob.c
+
 !NO!SUBS!
 ;;
 esac
@@ -807,6 +808,12 @@ $(LIBPERL_NONSHR): $(obj)
 
 !NO!SUBS!
 	;;
+MSWin32)
+	$spitshell >>$Makefile <<'!NO!SUBS!'
+LIBPERLEXPORT		= perllib$(OBJ_EXT)
+
+!NO!SUBS!
+	;;
 esac
 
 if test -s $Makefile_s ; then
@@ -851,9 +858,6 @@ $(LIBPERL): $& $(obj) $(DYNALOADER) $(LIBPERLEXPORT)
 		MSWin32)
 		$spitshell >>Makefile <<'!NO!SUBS!'
 	rm -f $@
-	$(MINIPERL) win32/create_perllibst_h.pl
-	$(CPS) perllibst.h lib/CORE/
-	$(CCCMD) $(PLDLFLAGS) perllib.c
 	$(MINIPERL) -w makedef.pl PLATFORM=win32 -DPERL_DLL=$(LIBPERL) \
 		$(CCFLAGS) \
 		CCTYPE="GCC" > perldll.def
@@ -865,6 +869,14 @@ $(LIBPERL): $& $(obj) $(DYNALOADER) $(LIBPERLEXPORT)
 		--output-exp perl.exp
 	$(LD) -o $@ $(SHRPLDFLAGS) $(obj) $(DYNALOADER) $(libs) perllib$(OBJ_EXT) perl.exp
 	$(CPS) $(LIBPERL) lib/CORE/
+
+perllib$(OBJ_EXT): perllibst.h
+	echo @`\$(CCCMD)` $(PLDLFLAGS) perllib.c
+	@`\$(CCCMD)` $(PLDLFLAGS) perllib.c
+
+perllibst.h:
+	$(MINIPERL) win32/create_perllibst_h.pl
+	$(CPS) perllibst.h lib/CORE/
 
 !NO!SUBS!
 		;;

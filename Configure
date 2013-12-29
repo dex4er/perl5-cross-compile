@@ -4753,7 +4753,7 @@ $rm -f testcpp.c testcpp.out
 case "$osname" in
 vos) cppfilter="tr '\\\\>' '/' |" ;; # path component separator is >
 os2) cppfilter="sed -e 's|\\\\\\\\|/|g' |" ;; # path component separator is \
-MSWin32) cppfilter="$sed 's,[a-z]:,,g' | $tr '\\\\\\\\' '/' |" ;;
+MSWin32|mswin32) cppfilter="$sed -e 's,[a-z]:,,g' | $tr '\\\\\\\\' '/' | $tr -d '\\r' |" ;; #  
 *)   cppfilter='' ;;
 esac
 
@@ -4763,7 +4763,7 @@ esac
 case "$ccname" in
     gcc)
         $echo 'extern int foo;' > try.c
-        set X `$cppstdin -v try.c 2>&1 | $awk '/^#include </,/^End of search /'|$cppfilter $grep '/include'`
+        set X `eval "$cppstdin -v < try.c 2>&1 | $cppfilter $awk '/^#include </,/^End of search /'| $grep '/include'"`
         shift
         if $test $# -gt 0; then
             incpth="$incpth $*"
@@ -4924,6 +4924,15 @@ rp="Directories to use for library searches?"
 case "$ans" in
 none) libpth=' ';;
 *) libpth="$ans";;
+esac
+
+case "$osname" in
+MSWin32|mswin32)
+for p in $libpth
+do
+    lddlflags="$lddlflags -L$p"
+done
+;;
 esac
 
 : compute shared library extension
@@ -7662,6 +7671,19 @@ unknown)
 	done
 	$test -r $1 || set $sysroot/usr/ccs/lib/libc.$so
 	$test -r $1 || set $sysroot/lib/libsys_s$_a
+	case "$osname" in
+	MSWin32|mswin32) 
+	    for p in $libpth
+	    do
+	        if $test -e $p/libmsvcrt.a; then
+	            set `ls -l $p/libmsvcrt.a | awk '{print $NF}'`
+	            if $test "X$1" != X; then
+	                break
+	            fi
+	        fi
+	    done
+	    ;;
+	esac
 	;;
 *)
 	set blurfl
@@ -7733,6 +7755,14 @@ fn=f
 rp='Where is your C library?'
 . ./getfile
 libc="$ans"
+
+case "$osname" in
+MSWin32|mswin32)
+    if $test "X$1" != X; then
+        lddlflags="$lddlflags -L$libc"
+    fi
+    ;;
+esac
 
 echo " "
 echo $libc $libnames | $tr ' ' $trnl | $sort | $uniq > libnames
