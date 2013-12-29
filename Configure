@@ -4753,6 +4753,7 @@ $rm -f testcpp.c testcpp.out
 case "$osname" in
 vos) cppfilter="tr '\\\\>' '/' |" ;; # path component separator is >
 os2) cppfilter="sed -e 's|\\\\\\\\|/|g' |" ;; # path component separator is \
+MSWin32) cppfilter="$sed 's,[a-z]:,,g' | $tr '\\\\\\\\' '/' |" ;;
 *)   cppfilter='' ;;
 esac
 
@@ -5583,10 +5584,11 @@ vos) testaccess=-e ;;
 *)   testaccess=-r ;;
 esac
 echo '#include <stdio.h>' > foo.c
+
 $cat >fieldn <<EOF
 $startsh
 $cppstdin $cppflags $cppminus <foo.c 2>/dev/null | \
-$grep '^[ 	]*#.*stdio\.h' | \
+$cppfilter $grep '^[ 	]*#.*stdio\.h' | \
 while read cline; do
 	pos=1
 	set \$cline
@@ -7744,14 +7746,16 @@ $sed 's/^/	/' libnames >&4
 echo " "
 $echo $n "This may take a while...$c" >&4
 
+# If we're cross-compiling for Win32, nm.exe will return lines with
+# \r\n, so get rid of the \r
 for file in $*; do
 	case $file in
 	*$so*) $nm $nm_so_opt $nm_opt $file 2>/dev/null;;
 	*) $nm $nm_opt $file 2>/dev/null;;
 	esac
-done >libc.tmp
+done | $tr -d '\r' >libc.tmp
 
-$echo $n ".$c"
+$echo $n ".$c" >&4
 $grep fprintf libc.tmp > libc.ptf
 xscan='eval "<libc.ptf $com >libc.list"; $echo $n ".$c" >&4'
 xrun='eval "<libc.tmp $com >libc.list"; echo "done." >&4'
@@ -7760,6 +7764,13 @@ if com="$sed -n -e 's/__IO//' -e 's/^.* $xxx  *//p'";\
 	eval $xscan;\
 	$contains '^fprintf$' libc.list >/dev/null 2>&1; then
 		eval $xrun
+# Special case to allow cross-compiling to Win32; basically the same
+# as the above, but using __imp instead of __IO. This is how functions
+# in the libmsvcrt.a provided by mingw will look like
+elif com="$sed -n -e 's/__imp//' -e 's/^.* $xxx  *//p'";\
+        eval $xscan;\
+        $contains '^fprintf$' libc.list >/dev/null 2>&1; then
+                eval $xrun
 elif com="$sed -n -e 's/^__*//' -e 's/^\([a-zA-Z_0-9$]*\).*xtern.*/\1/p'";\
 	eval $xscan;\
 	$contains '^fprintf$' libc.list >/dev/null 2>&1; then
