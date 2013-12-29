@@ -35,6 +35,15 @@ sub writemain{
 
     my(@exts) = @_;
 
+    if ( $^O eq 'MSWin32' ) {
+        # Cross-compiling to Win32, probably. runperl.c is our
+        # perlmain.c
+        open my $runperl, "<", "runperl.c"
+            or die "Can't open runperl.c for reading: $!";
+        print $fh do { local $/; <$runperl> };
+        return;
+    }
+    
     printf $fh <<'EOF!HEAD', xsi_header();
 /*    miniperlmain.c
  *
