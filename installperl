@@ -390,6 +390,17 @@ foreach my $file (@corefiles) {
     }
 }
 
+# Install symlink for Android
+if ($Is_Android) {
+    my @libspath = grep { /\S/ } split /\s+/, $Config{libspath};
+    my $libsdir = shift @libspath;
+    if ($libsdir) {
+        CORE::symlink("$installarchlib/CORE/$libperl", "$libsdir/$libperl");
+        $packlist->{"$libsdir/$libperl"} = { from => "$installarchlib/CORE/$libperl",
+                                             type => 'link' };
+    }
+}
+
 # Install main perl executables
 # Make links to ordinary names if installbin directory isn't current directory.
 
