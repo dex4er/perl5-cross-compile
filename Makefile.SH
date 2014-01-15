@@ -1483,14 +1483,14 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
 	\$(dynamic_ext) \$(TEST_PERL_DLL) runtests x2p/s2p x2p/find2perl \
 	\$(generated_pods)
 	$to libperl.*
-	$to t
-	$to lib
+	$to t/*
+	$to lib/*
 	$to TestInit.pm
 	$to win32/FindExt.pm
-	$to regen
-	$to pod
+	$to regen/*
+	$to pod/*
 	$to MANIFEST
-	$to Porting
+	$to Porting/*
 	$to cpan/*/t
 	$to dist/*/t
 	$to ext/*/t
@@ -1498,12 +1498,12 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
 	$to cpan/Pod-Usage/*
 	$to cpan/Pod-Parser/*
 	$to cpan/IO-Compress/*
-	$to cpan/HTTP-Tiny/lib
+	$to cpan/HTTP-Tiny/lib/*
 	$to cpan/Filter-Util-Call/filter-util.pl
 	$to cpan/Digest-MD5/*
 	$to cpan/Digest-SHA/*
 	$to cpan/Test-Simple/*
-	$to cpan/Pod-Parser/lib
+	$to cpan/Pod-Parser/lib/*
 	$to cpan/Test-Harness/*
 	$to cpan/Scalar-List-Utils/*
 	$to ext/IPC-Open3/*
@@ -1515,7 +1515,7 @@ test_prep test-prep: test_prep_pre \$(MINIPERL_EXE) \$(unidatafiles) \$(PERL_EXE
 	$to perl.h
 	$to cflags
 # --- For Module::Build
-	$to cpan/Module-Build/lib
+	$to cpan/Module-Build/lib/*
 	$to *.h
 # --- For t/x2p/s2p.t
 	$to x2p
