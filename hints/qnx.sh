@@ -248,14 +248,8 @@ else
   lddlflags="$lddlflags -shared"
   ccdlflags="$ccdlflags -Wl,-E"
 
-  if $test "X$usecrosscompile" = X; then
-    # Somewhere in the build, something tries to throw a gcc
-    # option to $cc if it knows it invokes gcc. Our cc doesn't
-    # recognize that option, so we're better off setting cc=gcc.
-    # Of course, only do this when not cross-compiling, for
-    # obvious reasons.
-    cc='gcc'
-  else
+  case "$usecrosscompile" in
+  define)
     # TODO this else should probably be an elif on $2 including
     # "Blackberry" or similar
     
@@ -287,7 +281,15 @@ else
     lddlflags="$lddlflags -lc -lm -lsocket "
     
     libpth="$libpth /proc/boot"
-  fi
+    ;;
+  *)
+    # Somewhere in the build, something tries to throw a gcc
+    # option to $cc if it knows it invokes gcc. Our cc doesn't
+    # recognize that option, so we're better off setting cc=gcc.
+    # Of course, only do this when not cross-compiling, for
+    # obvious reasons.
+    cc='gcc'
+  esac
 
   # gcc uses $QNX_TARGET/usr/include as the include directory.
   usrinc="$QNX_TARGET/usr/include"
