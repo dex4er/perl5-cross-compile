@@ -285,6 +285,8 @@ else
     
     ldflags="$ldflags -lc -lm -lsocket"
     lddlflags="$lddlflags -lc -lm -lsocket "
+    
+    libpth="$libpth /proc/boot"
   fi
 
   # gcc uses $QNX_TARGET/usr/include as the include directory.
