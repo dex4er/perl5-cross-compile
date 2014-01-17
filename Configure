@@ -22822,6 +22822,11 @@ echo " "
 echo "End of configuration questions."
 echo " "
 
+: rename osname
+case "$osname"  in
+linux-android) osname=android;;
+esac
+
 : back to where it started
 if test -d ../UU; then
 	cd ..
